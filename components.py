@@ -1,6 +1,5 @@
 from typing import Callable, Dict, Tuple
 
-import np
 
 from agent import Agent
 from utils import create_table

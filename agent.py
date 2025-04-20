@@ -12,10 +12,9 @@ class Agent(ABC):
         self.id=id
         self.mailbox : List[Message] = []
         self.domain = domain_size
-        self.assignment = None
+        self.assignment=np.random.randint(low=0,high=domain_size)
         self.neighbours : Dict[Agent,CostTable] = {}
         self.local_cost = float('inf')
-
 
     def receive_message(self, message:Message):
         self.mailbox.append(message)
@@ -27,6 +26,9 @@ class Agent(ABC):
             temp_cost = np.min(temp_cost,message.content,axis=)
 
 
+    @abstractmethod
+    def create_new_messages(self) ->List[Message]:
+        pass
 
 
     def set_neighbors(self, neighbors:List[tuple]):
@@ -37,6 +39,9 @@ class Agent(ABC):
                                                                                                    np.random.randint,
                                                                                                    neighbor,
                                                                                                    low= 100,high=200)
+    def empty_mailbox(self):
+        self.mailbox=[]
+
 
 
     #all dundler functions
@@ -53,8 +58,24 @@ class Agent(ABC):
         return hash(self.id)
 
 
+class MGMAgent(Agent):
+    def __init__(self,id:int ,name:str,domain_size:int):
+        super.__init__(id,name,domain_size)
+    def create_new_messages(self) ->List[Message]:
+
 
 class Mailer:
-    def send_message(self,agents:List[Agent]):
-        pass
+    def __init__(self):
+        global_cost = float('inf')
+        global_assignment :Dict[Agent,int]={}
+        mailbox : List[Message]=[]
+
+    def collect_messages(self,agents:List[Agent]):
+        for agent in agents:
+            self.mailbox.extend(agent.mailbox)
+            agent.empty_mailbox()
+    def send_messages(self):
+        for message in self.mailbox:
+            message.receiver.recieve_message(message)
+
 
