@@ -4,6 +4,7 @@ from typing import List, Dict, Callable
 import numpy as np
 
 from components import Message, CostTable
+from utils import create_random_connected_graph
 
 
 class Agent(ABC):
@@ -21,15 +22,12 @@ class Agent(ABC):
         self.mailbox.append(message)
 
     ########################################
+
     def find_assignment(self)-> int:
-        temp_cost = float('inf')
-        for message in self.mailbox:
-
-            
-
-
-    @abstractmethod
-    def create_new_messages(self) ->List[Message]:
+        """
+        Find the assignment for the agent based on the received messages.
+        This method should be implemented by subclasses.
+        """
         pass
 
     @property
@@ -37,19 +35,22 @@ class Agent(ABC):
         return f"Agent_{self.id}"
 
 
-    def set_neighbors(self, neighbors:List[tuple]):
-        for neighbor in neighbors:
-            if self in neighbor:
-                #TODO : make the ct func random.randint modular so when running we can chose the func
-                self.neighbours[(neighbor[1] if neighbor[0] == self else neighbor[0])] = CostTable(self.domain,
-                                                                                                   np.random.randint,
-                                                                                                   neighbor,
-                                                                                                   low= 100,high=200)
+class AgentGraph():
+    def __init__(self,num_variables:int,domain_size:int,density:float,seed:int):
+        self.g = create_random_connected_graph(num_variables,domain_size,density,seed)
+        self.iteration = 0
+        self.global_cost = float('inf')
+        self.mailer = Mailer()
+    def _set_neighbours(self):
+        for node in self.g.nodes:
+            neighbors = list(self.g.neighbors(node))
+            node.set_neighbors([(node, neighbor) for neighbor in neighbors])
+
+
+
+
     def empty_mailbox(self):
         self.mailbox=[]
-
-
-
     #all dunder functions
     def __str__(self):
         return f"Agent({self.name})"

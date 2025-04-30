@@ -1,4 +1,6 @@
 from __future__ import annotations
+
+from abc import abstractmethod
 from typing import Protocol, Tuple, List, Dict, Callable
 from typing import TypeAlias
 
@@ -38,10 +40,14 @@ class Agent(Protocol):
         self.neighbours_assignments : Dict[Agent,assignment] = {}
         self.local_cost = float('inf')
 
+
     def receive_message(self, message:Message):
         pass
     def find_assignment(self)-> int:
         pass
+
+
+
 
 class Method(Protocol):
     def __call__(self, *args, **kwargs)->Tuple[assignment,lr]:
