@@ -58,7 +58,8 @@ class Agent(ABC):
 
 class AgentGraph():
     def __init__(self,num_variables:int,domain_size:int,density:float,seed:int,ct_creation:Callable,ct_kwargs:Dict):
-        self.g = create_random_connected_graph(num_variables,domain_size,density,seed)
+        self.agents = self._create_agents(num_variables,domain_size)
+        self.G = self._create_random_connected_graph(density,seed)
         self.domain_size = domain_size
         self.iteration = 0
         self.global_cost = float('inf')
@@ -69,11 +70,23 @@ class AgentGraph():
         self.agents = list(self.g.nodes())
 
     def _set_constraints(self):
-        for edge in self.g.edges():
+        for edge in self.G.edges():
             agent1,agent2=edge
             ct = CostTable((agent1,agent2),self.domain_size,self.ct_creation,**self.ct_kwargs)
             agent1.neighbours[agent2] = ct
             agent2.neighbours[agent1] = ct
+    @staticmethod
+    def _create_agents(self,num_variables:int,domain_size:int):
+        """
+        Create agents with random assignments.
+        """
+        agents: List[Agent] = [Agent(i, domain_size) for i in range(num_variables)]
+        return agents
+    @staticmethod
+    def _create_random_connected_graph(self,density:float,seed:int):
+        tree = nx.random_tree(agents, seed=seed)
+        G = nx.erdos_renyi_graph(n=num_variables, p=density)  # 10 nodes, 50% probability of edge creation
+        G.add_nodes_from(agents)
     def visualize(self):
         """
         Visualize the graph using NetworkX and Matplotlib.
