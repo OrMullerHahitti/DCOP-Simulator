@@ -23,7 +23,7 @@ class Agent(ABC):
     def find_assignment(self)-> int:
         temp_cost = float('inf')
         for message in self.mailbox:
-            temp_cost = np.min(temp_cost,message.content,axis=)
+            
 
 
     @abstractmethod
@@ -44,7 +44,7 @@ class Agent(ABC):
 
 
 
-    #all dundler functions
+    #all dunder functions
     def __str__(self):
         return f"Agent({self.name})"
     #how the class will be shown in debugging or while editing
@@ -62,6 +62,7 @@ class MGMAgent(Agent):
     def __init__(self,id:int ,name:str,domain_size:int):
         super.__init__(id,name,domain_size)
     def create_new_messages(self) ->List[Message]:
+        pass
 
 
 class Mailer:
