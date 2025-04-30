@@ -35,18 +35,71 @@ def find_assignment(self) -> Tuple [assignment, lr]:
 
 # GLOBAL INFORMATION: ALL PREVIOUSE ITERATIONS GLOBAL COST, ASSIGNMRNTS.
 # finished = True if in the last iteration all the agents have the same assignment and the global cost is the same as the previous iteration
-finished = False
-i=0
-def DSA(self, p):
-    while (not finished and i<50):
-        save_iteration_information() # Save the current global cost and assignments of all agents
-        empty_mailboxs() # Empty all mailboxes
-        dispatch_messages() # Dispatch messages to all agents
 
-        for agent in self.agents: # זה מנקודת מבט על
-            messages = agent.receive_messages()
-            agent.update_neighbours_assignments(messages)
-            best_assignment = agent.find_assignment()[0]
+def perform_DSA(self, graph, seed, p) -> void:
+    init_agents(seed) # needs to be the same for each algorithem in the same index of running this problem (30 runs for the same problem (graph) on each of the 5 algorithems.)
+
+    for agent in graph.agents: # Every agent sends all neighbours its assignment
+        agent.send_messages(agent.assignment)
+    save_iteration_information()  # Save the initial global cost and assignments of all agents
+    i = 1
+    while (i <= 50):
+        if i > 2 and self.global_cost[i-1] == self.global_cost[i-2] and self.global_assignments[i-1] == self.global_assignments[i-2]:
+            break  # The algorithm has converged
+        else:
+            empty_mailboxs()  # Empty all mailboxes
+            dispatch_messages()  # Dispatch messages to all agents
+
+            for agent in self.agents: # זה מנקודת מבט על
+                perform_DSA_itr()  # Perform the iteration according to the algorithm for each agent.
+            save_iteration_information()  # Save the current global cost and assignments of all agents
+            i+=1
+
+################# agent method to perform the DSA algorithm ######################
+def perform_DSA_itr(self):
+    messages = self.receive_messages()
+    self.update_neighbours_assignments(messages)
+    best_assignment = self.find_assignment()[0]
+    if np.random.rand() <= self.p and best_assignment != self.assignment:  # Probability to accept the new assignment
+        self.assignment = best_assignment
+        self.send_messages(self.assignment)  # Send the assignment to neighbours only if it was changed
+
+
+def perform_MGM(self, graph, seed, p) -> void:
+    init_agents(seed)  # needs to be the same for each algorithem in the same index of running this problem (30 runs for the same problem (graph) on each of the 5 algorithems.)
+
+    for agent in graph.agents:  # Every agent sends all neighbours its assignment
+        agent.send_messages(agent.assignment)
+    save_iteration_information()  # Save the initial global cost and assignments of all agents
+    i = 1
+    while (i <= 50):
+        if i > 2 and self.global_cost[i - 1] == self.global_cost[i - 2] and self.global_assignments[i - 1] == \
+                self.global_assignments[i - 2]:
+            break  # The algorithm has converged
+        else:
+            empty_mailboxs()  # Empty all mailboxes
+            dispatch_messages()  # Dispatch messages to all agents
+
+            for agent in self.agents:  # זה מנקודת מבט על
+                agent.perform_MGM_itr_1()  #perform first half of the iteration
+            for agent in self.agents:
+                agent.perform_MGM_itr_2()  # perform second half of the iteration
+
+
+
+                perform_DSA_itr()  # Perform the iteration according to the algorithm for each agent.
+            save_iteration_information()  # Save the current global cost and assignments of all agents
+            i += 1
+def perform_MGM_itr_1(self) -> void: # MGM algorithm implementation
+    messages = self.receive_messages()
+    self.update_neighbours_assignments(messages)
+    best_assignment, lr = self.find_assignment()
+    if best_assignment != self.assignment:
+        self.send_messages(lr)
+        self.send_message(Message(self, self, best_assignment))  # Send myself the best assignment theres no need to compute it again in the second half or the MGM iteration
+        self.send_messages(Message(self, self, lr))  # Send the lr to myself so I can use it in the second half of the iteration
+def perform_MGM_itr_2(self) -> void: # MGM algorithm implementation
+    messages = self.receive_messages()
 
 
 
