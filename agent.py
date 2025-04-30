@@ -8,13 +8,14 @@ from components import Message, CostTable
 
 class Agent(ABC):
     def __init__(self,id:int ,name:str,domain_size:int):
-        self.name = name
         self.id=id
         self.mailbox : List[Message] = []
         self.domain = domain_size
         self.assignment=np.random.randint(low=0,high=domain_size)
         self.neighbours : Dict[Agent,CostTable] = {}
         self.local_cost = float('inf')
+
+
 
     def receive_message(self, message:Message):
         self.mailbox.append(message)
@@ -29,6 +30,10 @@ class Agent(ABC):
     @abstractmethod
     def create_new_messages(self) ->List[Message]:
         pass
+
+    @property
+    def name(self):
+        return f"Agent_{self.id}"
 
 
     def set_neighbors(self, neighbors:List[tuple]):
