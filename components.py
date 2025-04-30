@@ -10,9 +10,14 @@ class Message:
         self.receiver = receiver
         self.content = content
 
+
+
+
+
 class CostTable:
-    def __init__(self,agents:Tuple[Agent,Agent],domain:int,ct_creation:Callable,**kwargs):
-        self.table = self._create_table(domain,ct_creation,**kwargs)
+    def __init__(self,agents:Tuple[Agent,Agent],domain:int):
+        self.table = self._create_table(domain)
         self.connections = {agent: i for i,agent in enumerate(agents)}
-    def _create_table(self,domain:int,ct_creation:Callable,**kwargs) -> ndarray:
-        return ct_creation(size=(domain,)*2,**kwargs)
+    @staticmethod
+    def _create_table(domain: int, ct_creation: Callable, **kwargs) -> ndarray:
+        return ct_creation(size=(domain,) * 2, **kwargs)

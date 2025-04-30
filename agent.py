@@ -1,6 +1,8 @@
 import random
 from abc import ABC, abstractmethod
 from typing import List, Dict, Callable
+import matplotlib.pyplot as plt
+import networkx as nx
 
 import numpy as np
 
@@ -63,12 +65,27 @@ class AgentGraph():
         self.mailer = Mailer()
         self.ct_creation = ct_creation
         self.ct_kwargs = ct_kwargs
+        self._set_constraints()
+        self.agents = list(self.g.nodes())
+
     def _set_constraints(self):
         for edge in self.g.edges():
             agent1,agent2=edge
             ct = CostTable((agent1,agent2),self.domain_size,self.ct_creation,**self.ct_kwargs)
             agent1.neighbours[agent2] = ct
             agent2.neighbours[agent1] = ct
+    def visualize(self):
+        """
+        Visualize the graph using NetworkX and Matplotlib.
+        """
+
+        G = nx.Graph()
+        G.add_nodes_from(self.agents)
+        G.add_edges_from(self.g.edges())
+
+        pos = nx.spring_layout(G)
+        nx.draw(G, pos, with_labels=True, node_size=700, node_color='lightblue', font_size=10)
+        plt.show()
 
 
 class MGMAgent(Agent):
