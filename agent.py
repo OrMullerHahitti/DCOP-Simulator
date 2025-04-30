@@ -34,6 +34,26 @@ class Agent(ABC):
     def name(self):
         return f"Agent_{self.id}"
 
+    def empty_mailbox(self):
+        self.mailbox = []
+        # all dunder functions
+
+    def __str__(self):
+        return f"Agent({self.name})"
+        # how the class will be shown in debugging or while editing
+
+    def __repr__(self):
+        return f"Agent({self.name})"
+
+    def __eq__(self, other):
+        if not isinstance(other, Agent):
+            return False
+        return self.id == other.id
+
+    def __hash__(self):
+        return hash(self.id)
+
+
 
 class AgentGraph():
     def __init__(self,num_variables:int,domain_size:int,density:float,seed:int):
@@ -49,20 +69,7 @@ class AgentGraph():
 
 
 
-    def empty_mailbox(self):
-        self.mailbox=[]
-    #all dunder functions
-    def __str__(self):
-        return f"Agent({self.name})"
-    #how the class will be shown in debugging or while editing
-    def __repr__(self):
-        return f"Agent({self.name})"
-    def __eq__(self, other):
-        if not isinstance(other, Agent):
-            return False
-        return self.id == other.id
-    def __hash__(self):
-        return hash(self.id)
+
 
 
 class MGMAgent(Agent):
