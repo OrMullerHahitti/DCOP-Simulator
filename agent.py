@@ -7,7 +7,7 @@ from components import Message, CostTable
 
 
 class Agent(ABC):
-    def __init__(self,id:int ,name:str,domain_size:int):
+    def __init__(self,id:int ,domain_size:int):
         self.id=id
         self.mailbox : List[Message] = []
         self.domain = domain_size
@@ -24,6 +24,7 @@ class Agent(ABC):
     def find_assignment(self)-> int:
         temp_cost = float('inf')
         for message in self.mailbox:
+
             
 
 
@@ -83,5 +84,6 @@ class Mailer:
     def send_messages(self):
         for message in self.mailbox:
             message.receiver.recieve_message(message)
+
 
 
