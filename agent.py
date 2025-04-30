@@ -1,3 +1,4 @@
+import random
 from abc import ABC, abstractmethod
 from typing import List, Dict, Callable
 
@@ -15,8 +16,6 @@ class Agent(ABC):
         self.assignment=np.random.randint(low=0,high=domain_size)
         self.neighbours : Dict[Agent,CostTable] = {}
         self.local_cost = float('inf')
-
-
 
     def receive_message(self, message:Message):
         self.mailbox.append(message)
@@ -56,20 +55,20 @@ class Agent(ABC):
 
 
 class AgentGraph():
-    def __init__(self,num_variables:int,domain_size:int,density:float,seed:int):
+    def __init__(self,num_variables:int,domain_size:int,density:float,seed:int,ct_creation:Callable,ct_kwargs:Dict):
         self.g = create_random_connected_graph(num_variables,domain_size,density,seed)
+        self.domain_size = domain_size
         self.iteration = 0
         self.global_cost = float('inf')
         self.mailer = Mailer()
-    def _set_neighbours(self):
-        for node in self.g.nodes:
-            neighbors = list(self.g.neighbors(node))
-            node.set_neighbors([(node, neighbor) for neighbor in neighbors])
-
-
-
-
-
+        self.ct_creation = ct_creation
+        self.ct_kwargs = ct_kwargs
+    def _set_constraints(self):
+        for edge in self.g.edges():
+            agent1,agent2=edge
+            ct = CostTable((agent1,agent2),self.domain_size,self.ct_creation,**self.ct_kwargs)
+            agent1.neighbours[agent2] = ct
+            agent2.neighbours[agent1] = ct
 
 
 class MGMAgent(Agent):
