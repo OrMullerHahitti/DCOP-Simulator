@@ -23,7 +23,7 @@ class CostTable(Protocol):
         self.connections = Dict[Agent, int]
 
 class Message(Protocol):
-    def __init__(self, sender: Agent, receiver: Agent, content: assignment):
+    def __init__(self, sender: Agent, receiver: Agent, content: assignment|lr):
         self.sender = sender
         self.receiver = receiver
         self.content = content
@@ -33,8 +33,9 @@ class Agent(Protocol):
         self.id=id
         self.mailbox : List[Message] = []
         self.domain = domain_size
-        self.assignment=ndarray
+        self.assignment : int = np.random.randint(low=0,high=domain_size)
         self.neighbours : Dict[Agent,CostTable] = {}
+        self.neighbours_assignments : Dict[Agent,assignment] = {}
         self.local_cost = float('inf')
 
     def receive_message(self, message:Message):
