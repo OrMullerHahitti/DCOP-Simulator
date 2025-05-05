@@ -1,6 +1,7 @@
 from __future__ import annotations
 import random
 from abc import ABC, abstractmethod
+from enum import Enum
 from typing import List, Dict, Callable, Tuple, Optional
 import matplotlib.pyplot as plt
 import networkx as nx
@@ -8,11 +9,37 @@ import networkx as nx
 import numpy as np
 
 
+class MessageType(Enum):
+    LR = "LR"
+    ASSIGNMENT = "ASSIGNMENT"
+
+    def __str__(self):
+        return self.value
+
+
 class Message:
-    def __init__(self, sender, receiver, content):
+    def __init__(self, sender: str, recipient: str, content):
+        self.type = None
         self.sender = sender
-        self.receiver = receiver
+        self.recipient = recipient
         self.content = content
+
+
+class LRMessage(Message):
+    def __init__(self, sender: str, receiver: str, content: Tuple[int, float]):
+        super().__init__(sender, receiver, content)
+        self.type = MessageType.LR
+        self.content = content
+        self.sender_assignment = content[0]
+        self.sender_lr = content[1]
+
+
+class AssignmentMessage(Message):
+    def __init__(self, sender: str, receiver: str, content: int):
+        super().__init__(sender, receiver, content)
+        self.type = MessageType.ASSIGNMENT
+        self.content = content
+        self.sender_assignment = content
 
 
 class CostTable:
@@ -50,6 +77,10 @@ class Agent(ABC):
 
     def receive_message(self, message: Message):
         self.mailbox.append(message)
+    def send_messages(self):
+        """
+        Send messages to all neighbours.
+        """
 
     ########################################
 
@@ -90,8 +121,8 @@ class AgentGraph:
         num_variables: int,
         domain_size: int,
         density: float,
-        ct_creation: Callable,
-        ct_kwargs: Dict,
+        ct_creation: Callable,#np.random.randint, etc
+        ct_kwargs: Dict,#low, high, etc
     ):
         self.agents = self._create_agents(num_variables, domain_size)
         self.G = self._create_random_connected_graph(density)
@@ -110,8 +141,8 @@ class AgentGraph:
             ct = CostTable(
                 (agent1, agent2), self.domain_size, self.ct_creation, self.ct_kwargs
             )
-            agent1.neighbours[agent2] = ct
-            agent2.neighbours[agent1] = ct
+            agent1.neighbours[agent2.name] = ct
+            agent2.neighbours[agent1.name] = ct
 
     def _create_agents(self, num_variables: int, domain_size: int):
         """
@@ -163,15 +194,24 @@ class MGMAgent(Agent):
 
 class Mailer:
     def __init__(self):
-        global_cost = float("inf")
-        global_assignment: Dict[Agent, int] = {}
-        mailbox: List[Message] = []
+        self.global_cost = float("inf")
+        self.global_assignment: Dict[Agent, int] = {}
+        self.mailbox: List[Message] = []
+        self.agents: Dict[str:Agent] = {}
 
-    def collect_messages(self, agents: List[Agent]):
-        for agent in agents:
+    def set_agents(self):
+        """
+        Set the agents in the mailbox.
+        """
+        for agent in self.agents.values():
+            self.agents[agent.name] = agent
+
+    def collect_messages(self):
+        for agent in self.agents.values():
             self.mailbox.extend(agent.mailbox)
             agent.empty_mailbox()
 
     def send_messages(self):
         for message in self.mailbox:
-            message.receiver.recieve_message(message)
+            recipient = self.agents[message.recipient]
+            recipient.receive_message(message)
