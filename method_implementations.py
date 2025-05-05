@@ -104,7 +104,6 @@ def perform_MGM_itr_2(self) -> void: # MGM algorithm implementation
 
 
 class DsaMethod(Method):
-
     def __call__(self, *args, **kwargs)-> Tuple[assignment, lr]:
         # Implement the DSA algorithm here
         pass
