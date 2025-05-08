@@ -365,9 +365,7 @@ PRESET_PROBLEMS: List[ProblemConfig] = [
     ),
 ]
 
-# ----------------------------------------------------------------------------
-# Graph generation -----------------------------------------------------------
-# ----------------------------------------------------------------------------
+# graph generation
 def generate_constraint_graph(num_agents: int, density: float, domain_size: int,
                               cost_fn: Callable[[int, int], int],
                               agent_class: type[Agent]) -> Tuple[List[Agent], nx.Graph, Mailer]:
