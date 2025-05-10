@@ -85,7 +85,7 @@ class Agent:
             constraint = ConstraintCost(self.name, other.name, cost_matrix)
             self.constraints[other.name] = constraint
             # reverse
-            other.constraints[self.name] = ConstraintCost(other.name, self.name, cost_matrix.T)
+            other.constraints[self.name] = ConstraintCost(other.name, self.name, cost_matrix.T) #transposed
 
     # ---------- Messaging ------------------------------------------------------
 
