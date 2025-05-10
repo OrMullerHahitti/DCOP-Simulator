@@ -152,7 +152,6 @@ def pergorm_MGM2(self):
 
 
 class DsaMethod(Method):
-
     def __call__(self, *args, **kwargs)-> Tuple[assignment, lr]:
         # Implement the DSA algorithm here
         pass
