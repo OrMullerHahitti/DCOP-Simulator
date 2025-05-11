@@ -22,4 +22,10 @@ def main() -> None:
     logger.info("completed successfully")
 
 if __name__ == "__main__":
-    main()
+   # main()
+
+#####TRYING DSA####
+    from iot.problems import PRESET_PROBLEMS
+    from iot.agents import DSA
+    runner = ExperimentRunner(rounds=50)
+    runner._run_single(seed=1, prob=PRESET_PROBLEMS[1], algo_cls=DSA)

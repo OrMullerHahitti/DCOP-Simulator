@@ -15,7 +15,7 @@ import matplotlib as mpl
 import numpy as np
 
 from iot.core import Agent
-from iot.agents import DSAC, MGM, MGM2
+from iot.agents import DSA, MGM, MGM2
 from iot.graph import generate_constraint_graph
 from iot.problems import ProblemConfig, PRESET_PROBLEMS
 
@@ -36,15 +36,15 @@ class ExperimentRunner:
             self.output_dir.mkdir(exist_ok=True, parents=True)
 
     # ------------------------------------------------------------------
-    def _calculate_global_cost(self, agents: List[Agent]) -> int:
+    def _calculate_global_cost(self, agents: List[Agent], mailer) -> int:
         """Calculate the total cost across all constraints in the graph"""
         total_cost = 0
         seen_pairs: Set[Tuple[str, str]] = set()
         for a in agents:
-            for n in a.neighbours:
-                pair = tuple(sorted([a.name, n.name]))
+            for n in a.neighbors:
+                pair = tuple(sorted([a.name, n]))
                 if pair not in seen_pairs:
-                    total_cost += a.constraints[n.name].cost(a.value, n.value)
+                    total_cost += a.constraints[n].cost(a.assignment, mailer.global_mapping[n].assignment)
                     seen_pairs.add(pair)
         return total_cost
 
@@ -63,17 +63,17 @@ class ExperimentRunner:
         )
 
         for a in agents:
-            for n in a.neighbours:
-                a._send(n, np.array([a.value]), "value")
+            for n in a.neighbors:
+                a._send(n, np.array([a.assignment]), "assignment")
         mailer.deliver_all()
 
-        curve = [self._calculate_global_cost(agents)]
+        curve = [self._calculate_global_cost(agents, mailer)]
 
         for _ in range(self.rounds):
             for a in agents:
                 a.decide()
             mailer.deliver_all()
-            curve.append(self._calculate_global_cost(agents))
+            curve.append(self._calculate_global_cost(agents, mailer))
             for a in agents:
                 a.after_round()
 
@@ -99,9 +99,9 @@ class ExperimentRunner:
         mpl.rcParams["font.family"] = "DejaVu Sans"
 
         algorithms = {
-            "DSA-C (p=0.2)": type("DSA_p0_2", (DSAC,), {"p": 0.2}),
-            "DSA-C (p=0.7)": type("DSA_p0_7", (DSAC,), {"p": 0.7}),
-            "DSA-C (p=1.0)": type("DSA_p1_0", (DSAC,), {"p": 1.0}),
+            "DSA (p=0.2)": type("DSA_p0_2", (DSA,), {"p": 0.2}),
+            "DSA (p=0.7)": type("DSA_p0_7", (DSA,), {"p": 0.7}),
+            "DSA (p=1.0)": type("DSA_p1_0", (DSA,), {"p": 1.0}),
             "MGM": MGM,
             "MGM-2": MGM2,
         }

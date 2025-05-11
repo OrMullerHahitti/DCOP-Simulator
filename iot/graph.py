@@ -28,8 +28,8 @@ def generate_constraint_graph(num_agents: int, density: float, domain_size: int,
         - NetworkX graph representation
         - Mailer instance for agent communication
     """
-    mailer = Mailer()
     agents = [agent_class(f"A{i}", domain_size) for i in range(num_agents)]
+    mailer = Mailer(agents)
     for a in agents:
         a.mailer = mailer
 
@@ -45,9 +45,9 @@ def generate_constraint_graph(num_agents: int, density: float, domain_size: int,
     # basic nx graph  for  visualisation
     graph = nx.Graph()
     for i, a in enumerate(agents):
-        graph.add_node(a.name, value=a.value, pos=(i % 5, i // 5))
+        graph.add_node(a.name, assignment=a.assignment, pos=(i % 5, i // 5))
     for a in agents:
-        for n in a.neighbours:
-            graph.add_edge(a.name, n.name)
+        for n in a.neighbors:
+            graph.add_edge(a, n)
 
     return agents, graph, mailer
