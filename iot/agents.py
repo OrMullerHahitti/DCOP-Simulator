@@ -40,7 +40,7 @@ class MGM(Agent):
     
     def __init__(self, name: str, domain_size: int):
         super().__init__(name, domain_size)
-        self.mode = "assignment"
+        self.mode = "lr"
         self.best_lr = 0
         self.best_assignment = self.assignment
 
@@ -83,7 +83,7 @@ class MGM(Agent):
 
             for n in self.neighbors:
                 self._send(n, np.array([self.assignment]), "assignment")
-            self.mode = "assignment"
+            self.mode = "lr"
 
 
 class MGM2(Agent):
@@ -92,7 +92,7 @@ class MGM2(Agent):
     def __init__(self, name: str, domain_size: int):
         super().__init__(name, domain_size)
         self.best_pair_lr = None
-        self.received_lrs = None
+        self.received_lrs = {}
         self.is_offerer = False
         self.current_partner: Optional[str] = None
         self.best_offer: Optional[Tuple[int, int, int]] = None  # (partner_assignment, my_assignment, lr)

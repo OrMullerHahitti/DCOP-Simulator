@@ -107,16 +107,16 @@ class ExperimentRunner:
         }
 
         colours = {
-            "DSA-C (p=0.2)": "#1f77b4",
-            "DSA-C (p=0.7)": "#ff7f0e",
-            "DSA-C (p=1.0)": "#2ca02c",
+            "DSA (p=0.2)": "#1f77b4",
+            "DSA (p=0.7)": "#ff7f0e",
+            "DSA (p=1.0)": "#2ca02c",
             "MGM": "#d62728",
             "MGM-2": "#9467bd",
         }
         styles = {
-            "DSA-C (p=0.2)": "-",
-            "DSA-C (p=0.7)": "-",
-            "DSA-C (p=1.0)": "-",
+            "DSA (p=0.2)": "-",
+            "DSA (p=0.7)": "-",
+            "DSA (p=1.0)": "-",
             "MGM": "--",
             "MGM-2": "-.",
         }
