@@ -74,8 +74,6 @@ class ExperimentRunner:
                 a.decide()
             mailer.deliver_all()
             curve.append(self._calculate_global_cost(agents, mailer))
-            for a in agents:
-                a.after_round()
 
         return curve
 
