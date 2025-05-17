@@ -34,6 +34,8 @@ class DSA(Agent):
         for n in self.neighbors:
             self._send(n, np.array([self.assignment]), "assignment")
 
+        self.after_round()
+
 
 class MGM(Agent):
     """Maximum lr Message algorithm"""
@@ -45,12 +47,6 @@ class MGM(Agent):
         self.best_assignment = self.assignment
 
     def decide(self) -> None:
-        if self.mode == "assignment":
-            for n in self.neighbors:
-                self._send(n, np.array([self.assignment]), "assignment")
-            self.mode = "lr"
-            return
-
         if self.mode == "lr":
             neighbors_assignments = {m.sender: int(m.data[0]) for m in self.inbox if
                                      m.msg_type == "assignment"}  # gives a dictionary with neighbors as key and assignments as value
@@ -68,6 +64,7 @@ class MGM(Agent):
             for n in self.neighbors:
                 self._send(n, np.array([self.best_lr]), "lr")
             self.mode = "select"
+            self.after_round()
             return
 
         if self.mode == "select":
@@ -84,6 +81,7 @@ class MGM(Agent):
             for n in self.neighbors:
                 self._send(n, np.array([self.assignment]), "assignment")
             self.mode = "lr"
+            self.after_round()
 
 
 class MGM2(Agent):
@@ -159,15 +157,16 @@ class MGM2(Agent):
 
             if self.is_offerer and self.neighbors:
                 # Choose one neighbor as partner and send domain + neighbor info + constraint matrix
-                self.current_partner = random.choice(list(self.neighbors.keys()))
+                current_partner = random.choice(list(self.neighbors.keys()))
                 payload = np.array([
                     list(range(self.domain_size)),  # this agent's domain
                     self.neighbors,  # neighbors
                     self.constraints  # constraint costs
                 ], dtype=object)
-                self._send(self.current_partner, payload, "offer")
+                self._send(current_partner, payload, "offer")
 
             self.mode = "respond_phase"
+            self.after_round()
             return
 
         # -------------------- Mode: Respond Phase --------------------
@@ -177,6 +176,7 @@ class MGM2(Agent):
             if offers and not self.is_offerer:
                 offer = offers[0]
                 sender = offer.sender
+                self.current_partner = sender
                 partner_domain = offer.data[0]
                 partner_neighbors = offer.data[1]  # neighbors of sender, including their assignments (it's a dictionary)
                 constraint_matrices = offer.data[2]  # cost matrices of sender
@@ -206,6 +206,7 @@ class MGM2(Agent):
                 self._send(sender, np.array([my_best, partner_best, best_joint_lr]), "pair_proposal")
 
             self.mode = "lr_broadcast_phase"
+            self.after_round()
             return
 
         # -------------------- Mode: LR Broadcast Phase --------------------
@@ -215,6 +216,7 @@ class MGM2(Agent):
                 proposals = [m for m in self.inbox if m.msg_type == "pair_proposal"]
                 if proposals:
                     prop = proposals[0]
+                    self.current_partner = prop.sender
                     # (partner_assignment, my_assignment, joint_lr)
                     self.best_offer = (prop.data[0], prop.data[1], prop.data[2])
                     self.best_pair_lr = prop.data[2]
@@ -237,6 +239,7 @@ class MGM2(Agent):
                 self._send(neighbor, np.array([lr_value]), "lr")
 
             self.mode = "confirm_phase"
+            self.after_round()
             return
         # -------------------- Mode: Confirm Phase --------------------
         if self.mode == "confirm_phase":
@@ -265,6 +268,7 @@ class MGM2(Agent):
                     self._send(self.current_partner, np.array([1]), "confirm")
 
             self.mode = "apply_phase"
+            self.after_round()
             return
 
         # -------------------- Mode: Apply Phase --------------------
@@ -298,6 +302,7 @@ class MGM2(Agent):
 
             # Prepare for next round
             self.mode = "offer_phase"
+            self.after_round()
             return
 ###################OR's########################################################
     # def decide(self) -> None:

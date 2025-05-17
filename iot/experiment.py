@@ -26,7 +26,7 @@ logger = logging.getLogger(__name__)
 class ExperimentRunner:
     """Runner for DCOP algorithm experiments"""
     rounds: int
-    runs: int = 50                # 50 graphs per problem
+    runs: int = 30                # 30 graphs per problem
     visualize: bool = False       # node‑level visuals off - only for the word document
     save_plots: bool = True
     output_dir: Path = Path.cwd() / "plots"
