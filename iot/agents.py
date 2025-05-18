@@ -104,7 +104,7 @@ class MGM2(Agent):
 
     # ----------------------------------------------------------------------
 
-    def compute_partner_cost(self,
+    def compute_joint_cost(self,
             partner_assignment: int, computer_assignment: int,
             partner_neighbors: Dict[str, int],
             constraint_matrices: Dict[str, Union[ConstraintCost, list]]
@@ -140,6 +140,10 @@ class MGM2(Agent):
                     # this is the computer agent, so use its assignment
                     neighbor_assignment = computer_assignment
                 total_cost += cm[partner_assignment][neighbor_assignment]
+
+
+        # adding the local cost of the computatr agent minus the common constraint cost
+        total_cost += (self.current_local_cost() - self.constraints[self.current_partner].cost(self.assignment, self.neighbors[self.current_partner]))
 
         return total_cost
     def decide(self) -> None:
@@ -189,7 +193,7 @@ class MGM2(Agent):
                 old_self_cost = self._get_local_cost(self.assignment)
                 # Access partner agent to compute its local cost
                 partner_agent = sender
-                old_partner_cost = self.compute_partner_cost(self.neighbors[partner_agent], self.assignment, partner_neighbors, constraint_matrices) ######################## TO DO
+                old_joint_cost = self.compute_joint_cost(self.neighbors[partner_agent], self.assignment, partner_neighbors, constraint_matrices)
 
                 best_joint_lr = float('-inf')
                 my_best = self.assignment
@@ -199,8 +203,8 @@ class MGM2(Agent):
                 for my_assignment in range(self.domain_size):
                     new_self_cost = self._get_local_cost(my_assignment)
                     for partner_assignment in partner_domain:
-                        new_partner_cost = self.compute_partner_cost(partner_assignment, my_assignment, partner_neighbors, constraint_matrices)
-                        joint_lr = (old_self_cost + old_partner_cost) - (new_self_cost + new_partner_cost)
+                        new_joint_cost = self.compute_joint_cost(partner_assignment, my_assignment, partner_neighbors, constraint_matrices)
+                        joint_lr = old_joint_cost - new_joint_cost
                         if joint_lr > best_joint_lr:
                             best_joint_lr = joint_lr
                             my_best = my_assignment
